@@ -4,17 +4,18 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-// const { celebrate, errors } = require('celebrate');
+const { celebrate } = require('celebrate');
 const rateLimit = require('express-rate-limit');
+const { login, logout, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const router = require('./routes');
+const { signUp, signIn } = require('./utils/routerValidations');
 
 const {
   PORT,
   MONGODB_URL,
   // allowedCors, // TODO: return for production
 } = require('./env');
-
-const User = require('./models/user');
-const Movie = require('./models/movie');
 
 mongoose
   .connect(MONGODB_URL, {
@@ -80,58 +81,11 @@ app.use(cookieParser());
  * Routes
  */
 
-app.get('/', (req, res, next) => {
-  try {
-    res.send('Test');
-  } catch (error) {
-    next(error);
-  }
-});
-app.post('/', (req, res) => {
-  const { email, password, name } = req.body;
-  User.create({ email, password, name })
-    .then((user) => res.send({ sucsess: 'User has been created', data: user }))
-  // данные не записались, вернём ошибку
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка: ${err}` }));
-});
-app.post('/movie', (req, res) => {
-  const {
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    owner,
-    movieId,
-    nameRU,
-    nameEN,
-  } = req.body;
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    owner,
-    movieId,
-    nameRU,
-    nameEN,
-  })
-    .then((movie) => res.send({ sucsess: 'Movie has been created', data: movie }))
-  // данные не записались, вернём ошибку
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка: ${err}` }));
-});
-// app.post('/signup', celebrate(signUp), createUser);
-// app.post('/signin', celebrate(signIn), login);
-// app.get('/logout', logout);
-// app.use(auth);
-// app.use(router);
+app.post('/signup', celebrate(signUp), createUser);
+app.post('/signin', celebrate(signIn), login);
+app.get('/logout', logout);
+app.use(auth);
+app.use(router);
 
 /**
  * Errors handlers
@@ -150,5 +104,5 @@ app.post('/movie', (req, res) => {
  */
 
 app.listen(PORT, () => {
-  console.log(`Mivie app listening on port ${PORT}`);
+  console.log(`Movie app listening on port ${PORT}`);
 });
