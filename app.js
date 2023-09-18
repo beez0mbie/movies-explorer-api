@@ -83,7 +83,7 @@ app.use(cookieParser());
 
 app.post('/signup', celebrate(signUp), createUser);
 app.post('/signin', celebrate(signIn), login);
-app.get('/logout', logout);
+app.get('/signout', logout);
 app.use(auth);
 app.use(router);
 
