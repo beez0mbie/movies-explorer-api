@@ -9,8 +9,8 @@ const {
 } = process.env;
 
 const allowedCors = [
-  'https://movies.ashmelkov.nomoredomainsicu.ru', // TODO: может поменяться имя в будущем
-  'https://api.movies.ashmelkov.nomoredomainsicu.ru', // TODO: может поменяться имя в будущем
+  'https://movies.ashmelkov.nomoredomainsrocks.ru',
+  'https://api.movies.ashmelkov.nomoredomainsrocks.ru',
 ];
 
 module.exports = {

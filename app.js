@@ -42,7 +42,7 @@ if (NODE_ENV === 'production') {
   console.log('Production CORS');
   corsOptions = {
     origin: (origin, callback) => {
-      if (!origin || allowedCors.indexOf(origin) !== -1) {
+      if (allowedCors.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
