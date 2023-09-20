@@ -9,8 +9,6 @@ const {
 } = process.env;
 
 const allowedCors = [
-  'http://localhost:3000',
-  'http://localhost:3001',
   'https://movies.ashmelkov.nomoredomainsicu.ru', // TODO: может поменяться имя в будущем
   'https://api.movies.ashmelkov.nomoredomainsicu.ru', // TODO: может поменяться имя в будущем
 ];
