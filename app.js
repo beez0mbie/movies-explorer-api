@@ -39,6 +39,7 @@ const app = express();
  */
 let corsOptions;
 if (NODE_ENV === 'production') {
+  console.log('Production CORS');
   corsOptions = {
     origin: (origin, callback) => {
       if (!origin || allowedCors.indexOf(origin) !== -1) {
@@ -52,6 +53,7 @@ if (NODE_ENV === 'production') {
   };
 } else {
   // Allow all Corrs for local develop
+  console.log('All CORS allowed');
   corsOptions = {
     origin: '*',
     methods: '*',
