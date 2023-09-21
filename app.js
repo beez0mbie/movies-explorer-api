@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const { celebrate, errors } = require('celebrate');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -13,13 +12,17 @@ const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const handleErrors = require('./utils/errors');
 const { signUp, signIn } = require('./utils/routerValidations');
+const rateLimiter = require('./utils/rateLimiter');
+const corsOptions = require('./utils/cors');
 
 const {
   PORT,
   MONGODB_URL,
-  NODE_ENV,
-  allowedCors,
 } = require('./env');
+
+/**
+ * MONGODB
+ */
 
 mongoose
   .connect(MONGODB_URL, {
@@ -32,34 +35,15 @@ mongoose
     (err) => new Error(`Impossible connect to DB ${err.name}: ${err.message}`),
   );
 
+/**
+ * APP
+ */
+
 const app = express();
 
 /**
  * CORS
  */
-let corsOptions;
-if (NODE_ENV === 'production') {
-  console.log('Production CORS');
-  corsOptions = {
-    origin: (origin, callback) => {
-      if (allowedCors.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
-    credentials: true,
-  };
-} else {
-  // Allow all Corrs for local develop
-  console.log('All CORS allowed');
-  corsOptions = {
-    origin: '*',
-    methods: '*',
-    credentials: true,
-  };
-}
 
 app.use(cors(corsOptions));
 
@@ -67,13 +51,7 @@ app.use(cors(corsOptions));
  * Middlewares
  */
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-app.use(limiter);
+app.use(rateLimiter);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());

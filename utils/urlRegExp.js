@@ -1,3 +1,3 @@
-const urlRegExp = /^https?:\/\/(www\.)?[a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]{1,256}#?/;
+const urlRegExp = /^https?:\/\/(www\.)?[\w!#$&'()*+,./:;=?@[\]~]{1,256}#?/;
 
 module.exports = urlRegExp;
