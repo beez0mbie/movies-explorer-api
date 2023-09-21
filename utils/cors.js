@@ -2,16 +2,17 @@ const {
   NODE_ENV,
   allowedCors,
 } = require('../env');
+const { corsMessage } = require('../constants/messages');
 
 let corsOptions;
 if (NODE_ENV === 'production') {
-  console.log('Production CORS');
+  console.log(corsMessage.production);
   corsOptions = {
     origin: (origin, callback) => {
       if (allowedCors.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error(corsMessage.denied));
       }
     },
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
@@ -19,7 +20,7 @@ if (NODE_ENV === 'production') {
   };
 } else {
   // Allow all Corrs for local develop
-  console.log('All CORS allowed');
+  console.log(corsMessage.allowed);
   corsOptions = {
     origin: '*',
     methods: '*',

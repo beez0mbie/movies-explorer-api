@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { validateMessage } = require('../constants/messages');
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,7 +10,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: {
         validator: (email) => validator.isEmail(email),
-        message: 'Некорректный email',
+        message: validateMessage.notEmail,
       },
     },
     password: {
@@ -19,8 +20,8 @@ const userSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      minlength: [2, 'Минимальная длина поля "name" - 2'],
-      maxlength: [30, 'Максимальная длина поля "name" - 30'],
+      minlength: [2, validateMessage.minLength],
+      maxlength: [30, validateMessage.maxLength],
     },
   },
   { versionKey: false },

@@ -1,4 +1,5 @@
 const CustomError = require('../errors/customError');
+const { mongoMessage } = require('../constants/messages');
 
 const defaultServerError = (err, res) => res.status(500).send({ message: `Server Error ${err.message}` });
 
@@ -13,7 +14,7 @@ const handleErrors = (err, res) => {
     return res.status(err.statusCode).send(err.message);
   }
   if (err.code === 11000) {
-    return res.status(409).send({ message: 'MongoServerError: E11000 duplicate key error collection' });
+    return res.status(409).send({ message: mongoMessage.mongoServerError });
   }
   return defaultServerError(err, res);
 };

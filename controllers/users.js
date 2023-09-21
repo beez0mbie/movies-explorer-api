@@ -4,16 +4,19 @@ const UserModel = require('../models/user');
 const NotFoundError = require('../errors/notFound');
 const AuthorizationError = require('../errors/authorizationError');
 const getJwtSecretKey = require('../utils/getJwtSecretKey');
+const {
+  userMessage, authMessage,
+} = require('../constants/messages');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   UserModel.findOne({ email })
     .select('+password')
-    .orFail(new AuthorizationError('Неправильные почта или пароль'))
+    .orFail(new AuthorizationError(userMessage.notAllowedPasswordOfEmail))
     .then((user) => bcrypt.compare(password, user.password)
       .then((matched) => {
         if (!matched) {
-          throw new AuthorizationError('Неправильные почта или пароль');
+          throw new AuthorizationError(userMessage.notAllowedPasswordOfEmail);
         }
         const token = jwt.sign(
           { _id: user._id },
@@ -22,14 +25,14 @@ const login = (req, res, next) => {
         res.cookie('jwt', token, {
           maxAge: 3600000 * 24 * 365,
           httpOnly: true,
-        }).send({ message: 'Всё верно! JWT отправлен' });
+        }).send({ message: authMessage.jwtSend });
       }))
     .catch(next);
 };
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('jwt').send({ message: 'JWT удален' });
+    res.clearCookie('jwt').send({ message: authMessage.jwtDeleted });
   } catch (err) {
     next(err);
   }
@@ -38,7 +41,7 @@ const logout = (req, res, next) => {
 const getUser = (req, res, next) => {
   const userId = req.user._id;
   UserModel.findById(userId)
-    .orFail(new NotFoundError('Пользователя с таким ID не существует в базе'))
+    .orFail(new NotFoundError(userMessage.notFound))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -62,8 +65,9 @@ const updateUser = async (req, res, next) => {
       { name: req.body.name, email: req.body.email },
       {
         new: true,
+        runValidators: true,
       },
-    ).orFail(new NotFoundError('Пользователя с таким ID не существует в базе'));
+    ).orFail(new NotFoundError(userMessage.notFound));
     res.send(updatedUser);
   } catch (err) {
     next(err);

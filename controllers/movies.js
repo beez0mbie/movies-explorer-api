@@ -1,10 +1,16 @@
 const MovieModel = require('../models/movie');
 const NotFoundError = require('../errors/notFound');
 const AuthenticationError = require('../errors/authenticationError');
+const { movieMessage } = require('../constants/messages');
 
-const getMovies = (req, res, next) => MovieModel.find({})
-  .then((movies) => res.send(movies))
-  .catch(next);
+const getMovies = (req, res, next) => {
+  const owner = req.user._id;
+  MovieModel.find({
+    owner,
+  })
+    .then((movies) => res.send(movies))
+    .catch(next);
+};
 
 const createMovie = (req, res, next) => {
   const owner = req.user._id;
@@ -43,10 +49,10 @@ const deleteMovie = (req, res, next) => {
   const { movieId } = req.params;
   const userId = req.user._id;
   MovieModel.findOne({ movieId })
-    .orFail(new NotFoundError('Фильма с таким ID не существует в базе'))
+    .orFail(new NotFoundError(movieMessage.notFound))
     .then((movie) => {
       if (movie.owner.toString() !== userId) {
-        throw new AuthenticationError('Нет прав удалить данный фильм');
+        throw new AuthenticationError(movieMessage.notRightsToDelete);
       }
       return MovieModel.deleteOne({ _id: movie._id });
     })

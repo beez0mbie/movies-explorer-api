@@ -1,17 +1,15 @@
 require('dotenv').config();
 const express = require('express');
-const { celebrate, errors } = require('celebrate');
+const { errors } = require('celebrate');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 
-const { login, logout, createUser } = require('./controllers/users');
 const router = require('./routes');
-const auth = require('./middlewares/auth');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const handleErrors = require('./utils/errors');
-const { signUp, signIn } = require('./utils/routerValidations');
 const rateLimiter = require('./utils/rateLimiter');
 const corsOptions = require('./utils/cors');
 
@@ -61,10 +59,6 @@ app.use(requestLogger);
  * Routes
  */
 
-app.post('/signup', celebrate(signUp), createUser);
-app.post('/signin', celebrate(signIn), login);
-app.get('/signout', logout);
-app.use(auth);
 app.use(router);
 
 /**
