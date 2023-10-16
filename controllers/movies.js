@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const MovieModel = require('../models/movie');
 const NotFoundError = require('../errors/notFound');
 const AuthenticationError = require('../errors/authenticationError');
@@ -48,7 +49,7 @@ const createMovie = (req, res, next) => {
 const deleteMovie = (req, res, next) => {
   const { movieId } = req.params;
   const userId = req.user._id;
-  MovieModel.findOne({ movieId })
+  MovieModel.findOne({ movieId, owner: new mongoose.Types.ObjectId(userId) })
     .orFail(new NotFoundError(movieMessage.notFound))
     .then((movie) => {
       if (movie.owner.toString() !== userId) {
